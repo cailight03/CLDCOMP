@@ -2,8 +2,13 @@
 
 
 // Get the selected category from the query parameter
-$category = isset($_GET['category']) ? $connection->real_escape_string($_GET['category']) : '';
-
+if (isset($_GET['category'])) {
+  $category = $connection->real_escape_string($_GET['category']);
+} else {
+  // Redirect to index.php if 'category' is not set
+  header("Location: index.php");
+  exit();
+}
 
 ?>
 
@@ -111,7 +116,7 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
             <form id="updateProductForm" action="controller/update_product.php" method="POST" >
               <div class="mb-3">
 
-              <input type="hidden" name="id" value="">
+              <input type="hidden" name="id" id="updateProductId" value="">
 
               <label for="updateProductName" class="form-label">Product Name</label>
               <input type="text" class="form-control" id="updateProductName" name="name" required>
@@ -197,6 +202,7 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
                                 <table id="example" class="table table-striped data-table" style="width: 100%">
                                     <thead>
                                         <tr>
+                                        <th>ID</th>
                                             <th>Name</th>
                                             <th>Stock</th>
                                             <th>Price</th>
@@ -216,6 +222,7 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
                       // Output data of each row
                 while ($row = mysqli_fetch_assoc($result)) {
                   echo '<tr>';
+                  echo '<td>' . htmlspecialchars($row['id']) . '</td>';
                   echo '<td>' . htmlspecialchars($row['name']) . '</td>';
                   echo '<td>' . htmlspecialchars($row['stock']) . '</td>';
                   echo '<td>₱' . htmlspecialchars($row['price']) . '</td>';
@@ -226,7 +233,7 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
                   <button class="btn btn-warning btn-sm update-btn" 
                   data-bs-toggle="modal" 
                   data-bs-target="#updateProductModal" 
-                  data-product-id="' . $row['id'] . '"
+                  data-product-id="' . htmlspecialchars($row['id']) . '"
                   data-product-name="' . htmlspecialchars($row['name']) . '"
                   data-product-category="' . htmlspecialchars($row['category']) . '"
                   data-product-price="' . htmlspecialchars($row['price']) . '"
@@ -241,7 +248,7 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
                   echo '</tr>';
               }
           } else {
-              echo "<tr><td colspan='55' class='text-center'>No products found</td></tr>";
+              echo "<tr><td colspan='6' class='text-center'>No products found</td></tr>";
           }
                             ?>
                                     </tbody>
@@ -280,6 +287,23 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
         modal.find('#updateProductStock').val(productStock);
     });
 </script>
+
+<script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            if (status) {
+                const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+                const statusModalBody = document.getElementById('statusModalBody');
+                if (status === 'success') {
+                    statusModalBody.textContent = 'Product updated successfully!';
+                } else if (status === 'error') {
+                    statusModalBody.textContent = 'Error updating product.';
+                }
+                statusModal.show();
+            }
+        });
+    </script>
 
  
 </body>

@@ -175,7 +175,7 @@ session_start();
                 <div class="col-md-12 mb-3">
                     <div class="card">
                         <div class="card-header">
-                            <span><i class="bi bi-table me-2"></i></span> Product list
+                            <span><i class="bi bi-table me-2"></i></span> All Products list
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -200,9 +200,9 @@ session_start();
                     // Output data of each row
                     while($row = mysqli_fetch_assoc($result)) {
                         echo '<tr>';
-                        echo '<td>' . $row["product_name"] . '</td>';
-                        echo '<td>' . $row["category_name"] . '</td>';
-                        echo '<td>' . $row["quantity"] . '</td>';
+                        echo '<td>' . $row["name"] . '</td>';
+                        echo '<td>' . $row["category"] . '</td>';
+                        echo '<td>' . $row["stock"] . '</td>';
                         echo '<td>₱' . $row["price"] . '</td>';
                         echo '<td>' . $row["last_restock"] . '</td>';
                         echo '</tr>';
