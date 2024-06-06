@@ -1,3 +1,12 @@
+<?php include 'config/connection.php';
+
+
+// Get the selected category from the query parameter
+$category = isset($_GET['category']) ? $connection->real_escape_string($_GET['category']) : '';
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,91 +21,83 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- top navigation bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-      <div class="container-fluid">
-        <div class="logo">
-          <img src="img/minimart.png" width="100">
-        </div>
-        <div class="navbar-collapse" id="topNavBar">
-          <form class="d-flex ms-auto my-3 my-lg-0">
-            <div class="input-group">
-              <input class="form-control" type="search" placeholder="Search" aria-label="Search" />
-              <button class="btn btn-primary" type="submit">
-                <i class="bi bi-search"></i>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </nav>
-    <!-- top navigation bar -->
+  <?php include "navbar.php"?>
+  
 
     <!-- Sidebar -->
     <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
         <div class="position-sticky">
             <div class="list-group list-group-flush mx-3 mt-4">
-                <a href="#" class="list-group-item list-group-item-action py-2 ripple" aria-current="true">
-                    <i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Dairy</span>
-                </a>
-                <a href="#" class="list-group-item list-group-item-action py-2 ripple">
-                    <i class="fas fa-chart-area fa-fw me-3"></i><span>Poultry</span>
-                </a>
-                <a href="#" class="list-group-item list-group-item-action py-2 ripple">
-                    <i class="fas fa-lock fa-fw me-3"></i><span>Meat</span>
-                </a>
-                <a href="#" class="list-group-item list-group-item-action py-2 ripple">
-                    <i class="fas fa-chart-pie fa-fw me-3"></i><span>Fruits</span>
-                </a>
-                <a href="#" class="list-group-item list-group-item-action py-2 ripple">
-                    <i class="fas fa-chart-bar fa-fw me-3"></i><span>Vegetables</span>
-                </a>
-                <a href="#" class="list-group-item list-group-item-action py-2 ripple">
-                    <i class="fas fa-globe fa-fw me-3"></i><span>Hygiene</span>
-                </a>
-                <a href="#" class="list-group-item list-group-item-action py-2 ripple">
-                    <i class="fas fa-building fa-fw me-3"></i><span>Baked Goods</span>
-                </a>
-                <a href="#" class="list-group-item list-group-item-action py-2 ripple">
-                    <i class="fas fa-calendar fa-fw me-3"></i><span>Utensils</span>
-                </a>
-            </div>
+                <?php
+                // Fetch categories from the database
+                $query = "SELECT * FROM categories";
+                $result = mysqli_query($connection, $query);
 
+                // Check if any categories were found
+                if (mysqli_num_rows($result) > 0) {
+                    // Output data of each row
+                      // Output data of each row
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo '<a href="product.php?category=' . urlencode($row["category_name"]) . '" class="list-group-item list-group-item-action py-2 ripple">';
+                    echo '<i class="fas fa-tachometer-alt fa-fw me-3"></i><span>' . htmlspecialchars($row["category_name"]) . '</span>';
+                    echo '</a>';
+                }
+                } else {
+                    echo '<p>No categories found.</p>';
+                }
+                ?>
+            </div>
             <div class="sidebar-button">
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
             </div>
         </div>
     </nav>
-    <!-- End Sidebar -->
+    <!-- Sidebar -->
+
+
+
 
     <!-- Add Category Modal -->
     <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addCategoryModalLabel">Add New Product</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form id="addCategoryForm">
-              <div class="mb-3">
-                <label for="categoryName" class="form-label">Category Name</label>
-                <input type="text" class="form-control" id="categoryName" required>
-                <label for="productName" class="form-label">Product Name</label>
-                <input type="text" class="form-control" id="productName" required>
-                <label for="price" class="form-label">Price</label>
-                <input type="text" class="form-control" id="price" required>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" form="addCategoryForm" class="btn btn-primary">Save Product</button>
-          </div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCategoryForm" method="post" action="controller/add_category.php">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Category Name</label>
+                            <input type="text" class="form-control" id="categoryName" name="category_name" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Category</button>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
     <!-- End Add Category Modal -->
+
+
+    <!-- Status Modal -->
+    <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statusModalLabel">Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="statusModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End of Status Modal -->
 
     <!-- Update Product Modal -->
     <div class="modal fade" id="updateProductModal" tabindex="-1" aria-labelledby="updateProductModalLabel" aria-hidden="true">
@@ -107,14 +108,23 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form id="updateProductForm">
+            <form id="updateProductForm" action="controller/update_product.php" method="POST" >
               <div class="mb-3">
-                <label for="updateCategoryName" class="form-label">Category Name</label>
-                <input type="text" class="form-control" id="updateCategoryName" required>
-                <label for="updateProductName" class="form-label">Product Name</label>
-                <input type="text" class="form-control" id="updateProductName" required>
-                <label for="updatePrice" class="form-label">Price</label>
-                <input type="text" class="form-control" id="updatePrice" required>
+
+              <input type="hidden" name="id" value="">
+
+              <label for="updateProductName" class="form-label">Product Name</label>
+              <input type="text" class="form-control" id="updateProductName" name="name" required>
+
+            
+              <input type="hidden" class="form-control" id="updateProductCategory" name="category" required>
+
+              <label for="updatePrice" class="form-label">Price</label>
+              <input type="text" class="form-control" id="updatePrice" name="price" required>
+
+              <label for="updateProductStock" class="form-label">Stock</label>
+              <input type="number" class="form-control" id="updateProductStock" name="stock" required>
+                     
               </div>
             </form>
           </div>
@@ -173,7 +183,9 @@
     <!-- End Restock Product Modal -->
 
     <main class="mt-5 pt-3">
+      
         <div class="container-fluid">
+        <h2 class="py-3"><?php echo $category?></h2>
             <div class="row">
                 <div class="col-md-12 mb-3">
                     <div class="card">
@@ -186,7 +198,6 @@
                                     <thead>
                                         <tr>
                                             <th>Name</th>
-                                            <th>Category</th>
                                             <th>Stock</th>
                                             <th>Price</th>
                                             <th>Last Restock</th>
@@ -194,78 +205,45 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>BearBrand</td>
-                                            <td>Meat</td>
-                                            <td>125</td>
-                                            <td>₱86.00</td>
-                                            <td>2024/04/25</td>
-                                            <td>
-                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateProductModal">Update</button>
-                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">Delete</button>
-                                                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockProductModal">Restock</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>PorkChop</td>
-                                            <td>Meat</td>
-                                            <td>125</td>
-                                            <td>₱86.00</td>
-                                            <td>2024/04/25</td>
-                                            <td>
-                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateProductModal">Update</button>
-                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">Delete</button>
-                                                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockProductModal">Restock</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Lemon</td>
-                                            <td>Meat</td>
-                                            <td>125</td>
-                                            <td>₱86.00</td>
-                                            <td>2024/04/25</td>
-                                            <td>
-                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateProductModal">Update</button>
-                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">Delete</button>
-                                                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockProductModal">Restock</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>BabyWipes</td>
-                                            <td>Meat</td>
-                                            <td>125</td>
-                                            <td>₱86.00</td>
-                                            <td>2024/04/25</td>
-                                            <td>
-                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateProductModal">Update</button>
-                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">Delete</button>
-                                                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockProductModal">Restock</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Pacencia</td>
-                                            <td>Baked Goods</td>
-                                            <td>125</td>
-                                            <td>₱86.00</td>
-                                            <td>2024/04/25</td>
-                                            <td>
-                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateProductModal">Update</button>
-                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">Delete</button>
-                                                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockProductModal">Restock</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Knife</td>
-                                            <td>Utensils</td>
-                                            <td>125</td>
-                                            <td>₱86.00</td>
-                                            <td>2024/04/25</td>
-                                            <td>
-                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateProductModal">Update</button>
-                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal">Delete</button>
-                                                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#restockProductModal">Restock</button>
-                                            </td>
-                                        </tr>
+                                    <?php
+                            // Fetch categories from the database
+                $query = "SELECT * FROM product_list where category='$category'";
+                $result = mysqli_query($connection, $query);
+
+                // Check if any categories were found
+                if (mysqli_num_rows($result) > 0) {
+                    // Output data of each row
+                      // Output data of each row
+                while ($row = mysqli_fetch_assoc($result)) {
+                  echo '<tr>';
+                  echo '<td>' . htmlspecialchars($row['name']) . '</td>';
+                  echo '<td>' . htmlspecialchars($row['stock']) . '</td>';
+                  echo '<td>₱' . htmlspecialchars($row['price']) . '</td>';
+                  echo '<td>' . htmlspecialchars($row['last_restock']) . '</td>';
+                  
+
+                  echo '<td>
+                  <button class="btn btn-warning btn-sm update-btn" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#updateProductModal" 
+                  data-product-id="' . $row['id'] . '"
+                  data-product-name="' . htmlspecialchars($row['name']) . '"
+                  data-product-category="' . htmlspecialchars($row['category']) . '"
+                  data-product-price="' . htmlspecialchars($row['price']) . '"
+                  data-product-stock="' . htmlspecialchars($row['stock']) . '">Update</button>
+          <button class="btn btn-danger btn-sm" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#deleteConfirmationModal">Delete</button>
+          <button class="btn btn-success btn-sm" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#restockProductModal">Restock</button>
+                  </td>';
+                  echo '</tr>';
+              }
+          } else {
+              echo "<tr><td colspan='55' class='text-center'>No products found</td></tr>";
+          }
+                            ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -275,12 +253,33 @@
         </div>
     </div>
 </div>
+
+
     </main>
 
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.0.0/js/dataTables.bootstrap5.js"></script>
+
+    <script>
+    $('#updateProductModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var productId = button.data('product-id');
+        var productName = button.data('product-name');
+        var productCategory = button.data('product-category');
+        var productPrice = button.data('product-price');
+        var productStock = button.data('product-stock');
+        
+
+        var modal = $(this);
+        modal.find('#updateProductId').val(productId);
+        modal.find('#updateProductName').val(productName);
+        modal.find('#updateProductCategory').val(productCategory);
+        modal.find('#updatePrice').val(productPrice);
+        modal.find('#updateProductStock').val(productStock);
+    });
+</script>
 
  
 </body>

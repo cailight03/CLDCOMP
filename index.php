@@ -20,29 +20,10 @@ session_start();
 
 </head>
 <body>
-    <!-- top navigation bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-      <div class="container-fluid">
-        <div class="logo">
-          <img src="img/minimart.png" width="100">
-        </div>
-        <div class="navbar-collapse" id="topNavBar">
-          <form class="d-flex ms-auto my-3 my-lg-0">
-            <div class="input-group">
-              <input class="form-control" type="search" placeholder="Search" aria-label="Search" />
-              <button class="btn btn-primary" type="submit">
-                <i class="bi bi-search"></i>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </nav>
-    <!-- top navigation bar -->
+   <?php include "navbar.php"?>
 
-    
-    <!-- Sidebar -->
-    <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
+     <!-- Sidebar -->
+     <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
         <div class="position-sticky">
             <div class="list-group list-group-flush mx-3 mt-4">
                 <?php
@@ -53,11 +34,12 @@ session_start();
                 // Check if any categories were found
                 if (mysqli_num_rows($result) > 0) {
                     // Output data of each row
-                    while($row = mysqli_fetch_assoc($result)) {
-                        echo '<a href="#" class="list-group-item list-group-item-action py-2 ripple">';
-                        echo '<i class="fas fa-tachometer-alt fa-fw me-3"></i><span>' . $row["category_name"] . '</span>';
-                        echo '</a>';
-                    }
+                      // Output data of each row
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo '<a href="product.php?category=' . urlencode($row["category_name"]) . '" class="list-group-item list-group-item-action py-2 ripple">';
+                    echo '<i class="fas fa-tachometer-alt fa-fw me-3"></i><span>' . htmlspecialchars($row["category_name"]) . '</span>';
+                    echo '</a>';
+                }
                 } else {
                     echo '<p>No categories found.</p>';
                 }
@@ -69,7 +51,7 @@ session_start();
         </div>
     </nav>
     <!-- Sidebar -->
-
+    
     <!-- Add Category Modal -->
     <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
         <div class="modal-dialog">
