@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Use prepared statement to prevent SQL injection
         $updateQuery = $connection->prepare("UPDATE product_list SET name = ?, price = ?, stock = ? WHERE id = ?");
-        $updateQuery->bind_param("siii", $productName, $productPrice, $productStock, $productId);
+        $updateQuery->bind_param("sdii", $productName, $productPrice, $productStock, $productId);
 
         if ($updateQuery->execute()) {
             $updateQuery->close(); // Close prepared statement

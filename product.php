@@ -52,9 +52,7 @@ if (isset($_GET['category'])) {
                 }
                 ?>
             </div>
-            <div class="sidebar-button">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
-            </div>
+            
         </div>
     </nav>
     <!-- Sidebar -->
@@ -62,27 +60,38 @@ if (isset($_GET['category'])) {
 
 
 
-    <!-- Add Category Modal -->
-    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addCategoryForm" method="post" action="controller/add_category.php">
-                        <div class="mb-3">
-                            <label for="categoryName" class="form-label">Category Name</label>
-                            <input type="text" class="form-control" id="categoryName" name="category_name" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Add Category</button>
-                    </form>
-                </div>
-            </div>
+   <!-- Add Category Modal -->
+   <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addCategoryModalLabel">Add New Product</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="addCategoryForm" action="controller/add_product.php" method="POST">
+              <div class="mb-3">
+                <label for="categoryName" class="form-label">Category Name</label>
+                <input type="text" class="form-control" id="categoryName" name="categoryName" required>
+                <label for="productName" class="form-label">Product Name</label>
+                <input type="text" class="form-control" id="productName" name="productName" required>
+                <label for="price" class="form-label">Price</label>
+                <input type="text" class="form-control" id="price" name="price" required>
+
+               
+
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" form="addCategoryForm" class="btn btn-primary">Save Product</button>
+          </div>
         </div>
+      </div>
     </div>
     <!-- End Add Category Modal -->
+
 
 
     <!-- Status Modal -->
@@ -202,7 +211,6 @@ if (isset($_GET['category'])) {
                                 <table id="example" class="table table-striped data-table" style="width: 100%">
                                     <thead>
                                         <tr>
-                                        <th>ID</th>
                                             <th>Name</th>
                                             <th>Stock</th>
                                             <th>Price</th>
@@ -221,8 +229,7 @@ if (isset($_GET['category'])) {
                     // Output data of each row
                       // Output data of each row
                 while ($row = mysqli_fetch_assoc($result)) {
-                  echo '<tr>';
-                  echo '<td>' . htmlspecialchars($row['id']) . '</td>';
+                  echo '<tr>';             
                   echo '<td>' . htmlspecialchars($row['name']) . '</td>';
                   echo '<td>' . htmlspecialchars($row['stock']) . '</td>';
                   echo '<td>₱' . htmlspecialchars($row['price']) . '</td>';
@@ -248,7 +255,7 @@ if (isset($_GET['category'])) {
                   echo '</tr>';
               }
           } else {
-              echo "<tr><td colspan='6' class='text-center'>No products found</td></tr>";
+              echo "<tr><td colspan='5' class='text-center'>No products found</td></tr>";
           }
                             ?>
                                     </tbody>
@@ -259,10 +266,14 @@ if (isset($_GET['category'])) {
  </div>          
         </div>
     </div>
+   
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Product</button>
+           
 </div>
 
 
     </main>
+    
 
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
