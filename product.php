@@ -139,47 +139,49 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
 
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="deleteConfirmationModalLabel">Delete Confirmation</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p>Are you sure you want to delete this product?</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger">Delete</button>
-          </div>
-        </div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmationModalLabel">Delete Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this product?</p>
+        <input type="hidden" id="deleteProductId">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
       </div>
     </div>
+  </div>
+</div>
     <!-- End Delete Confirmation Modal -->
 
     <!-- Restock Product Modal -->
     <div class="modal fade" id="restockProductModal" tabindex="-1" aria-labelledby="restockProductModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="restockProductModalLabel">Restock Product</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="restockProductModalLabel">Restock Product</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="restockProductForm">
+          <div class="mb-3">
+            <label for="restockAmount" class="form-label">Amount to Restock</label>
+            <input type="number" class="form-control" id="restockAmount" name="restock_amount" required>
+            <input type="hidden" id="restockProductId" name="product_id">
           </div>
-          <div class="modal-body">
-            <form id="restockProductForm">
-              <div class="mb-3">
-                <label for="restockAmount" class="form-label">Amount to Restock</label>
-                <input type="number" class="form-control" id="restockAmount" required>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" form="restockProductForm" class="btn btn-primary">Restock</button>
-          </div>
-        </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" form="restockProductForm" class="btn btn-primary">Restock</button>
       </div>
     </div>
+  </div>
+</div>
     <!-- End Restock Product Modal -->
 
     <main class="mt-5 pt-3">
@@ -206,43 +208,41 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
                                     </thead>
                                     <tbody>
                                     <?php
-                            // Fetch categories from the database
-                $query = "SELECT * FROM product_list where category='$category'";
-                $result = mysqli_query($connection, $query);
 
-                // Check if any categories were found
-                if (mysqli_num_rows($result) > 0) {
-                    // Output data of each row
-                      // Output data of each row
-                while ($row = mysqli_fetch_assoc($result)) {
-                  echo '<tr>';
-                  echo '<td>' . htmlspecialchars($row['name']) . '</td>';
-                  echo '<td>' . htmlspecialchars($row['stock']) . '</td>';
-                  echo '<td>₱' . htmlspecialchars($row['price']) . '</td>';
-                  echo '<td>' . htmlspecialchars($row['last_restock']) . '</td>';
-                  
-
-                  echo '<td>
-                  <button class="btn btn-warning btn-sm update-btn" 
-                  data-bs-toggle="modal" 
-                  data-bs-target="#updateProductModal" 
-                  data-product-id="' . $row['id'] . '"
-                  data-product-name="' . htmlspecialchars($row['name']) . '"
-                  data-product-category="' . htmlspecialchars($row['category']) . '"
-                  data-product-price="' . htmlspecialchars($row['price']) . '"
-                  data-product-stock="' . htmlspecialchars($row['stock']) . '">Update</button>
-          <button class="btn btn-danger btn-sm" 
-                  data-bs-toggle="modal" 
-                  data-bs-target="#deleteConfirmationModal">Delete</button>
-          <button class="btn btn-success btn-sm" 
-                  data-bs-toggle="modal" 
-                  data-bs-target="#restockProductModal">Restock</button>
-                  </td>';
-                  echo '</tr>';
-              }
-          } else {
-              echo "<tr><td colspan='55' class='text-center'>No products found</td></tr>";
-          }
+                            $query = "SELECT * FROM product_list where category='$category'";
+                            $result = mysqli_query($connection, $query);
+                            
+                            // Check if any categories were found
+                            if (mysqli_num_rows($result) > 0) {
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                  echo '<tr>';
+                                  echo '<td>' . htmlspecialchars($row['name']) . '</td>';
+                                  echo '<td>' . htmlspecialchars($row['stock']) . '</td>';
+                                  echo '<td>₱' . htmlspecialchars($row['price']) . '</td>';
+                                  echo '<td>' . htmlspecialchars($row['last_restock']) . '</td>';
+                                  echo '<td>
+                                          <button class="btn btn-warning btn-sm update-btn" 
+                                                  data-bs-toggle="modal" 
+                                                  data-bs-target="#updateProductModal" 
+                                                  data-product-id="' . $row['id'] . '"
+                                                  data-product-name="' . htmlspecialchars($row['name']) . '"
+                                                  data-product-category="' . htmlspecialchars($row['category']) . '"
+                                                  data-product-price="' . htmlspecialchars($row['price']) . '"
+                                                  data-product-stock="' . htmlspecialchars($row['stock']) . '">Update</button>
+                                          <button class="btn btn-danger btn-sm delete-btn" 
+                                                  data-bs-toggle="modal" 
+                                                  data-bs-target="#deleteConfirmationModal"
+                                                  data-product-id="' . $row['id'] . '">Delete</button>
+                                          <button class="btn btn-success btn-sm restock-btn" 
+                                                  data-bs-toggle="modal" 
+                                                  data-bs-target="#restockProductModal"
+                                                  data-product-id="' . $row['id'] . '">Restock</button>
+                                        </td>';
+                                  echo '</tr>';
+                                }
+                            } else {
+                                echo "<tr><td colspan='5' class='text-center'>No products found</td></tr>";
+                            }
                             ?>
                                     </tbody>
                                 </table>
@@ -262,6 +262,64 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
     <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.0.0/js/dataTables.bootstrap5.js"></script>
 
+    <script>
+      $(document).ready(function() {
+    $('#restockProductModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var productId = button.data('product-id');
+        var modal = $(this);
+        modal.find('#restockProductId').val(productId);
+    });
+
+    $('#restockProductForm').submit(function(event) {
+        event.preventDefault();
+        var formData = $(this).serialize();
+        $.ajax({
+            url: 'controller/restock_product.php',
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                $('#statusModalBody').text(response.message);
+                $('#statusModal').modal('show');
+                $('#restockProductModal').modal('hide');
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred while restocking the product.');
+            }
+        });
+    });
+});
+      </script>
+
+    <script>
+$(document).ready(function() {
+    $('#deleteConfirmationModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var productId = button.data('product-id'); // Extract product ID from data-* attributes
+        var modal = $(this);
+        modal.find('#deleteProductId').val(productId);
+    });
+
+    $('#confirmDeleteBtn').click(function () {
+        var productId = $('#deleteProductId').val();
+        $.ajax({
+            url: 'controller/delete_product.php',
+            type: 'POST',
+            data: { id: productId },
+            success: function(response) {
+                // Handle the response from the server
+                // For example, reload the page to see the changes
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                // Handle errors
+                alert('An error occurred while deleting the product.');
+            }
+        });
+    });
+});
+</script>
     <script>
     $('#updateProductModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
