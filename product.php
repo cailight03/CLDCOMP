@@ -2,8 +2,13 @@
 
 
 // Get the selected category from the query parameter
-$category = isset($_GET['category']) ? $connection->real_escape_string($_GET['category']) : '';
-
+if (isset($_GET['category'])) {
+  $category = $connection->real_escape_string($_GET['category']);
+} else {
+  // Redirect to index.php if 'category' is not set
+  header("Location: index.php");
+  exit();
+}
 
 ?>
 
@@ -47,9 +52,7 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
                 }
                 ?>
             </div>
-            <div class="sidebar-button">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
-            </div>
+            
         </div>
     </nav>
     <!-- Sidebar -->
@@ -57,27 +60,38 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
 
 
 
-    <!-- Add Category Modal -->
-    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addCategoryForm" method="post" action="controller/add_category.php">
-                        <div class="mb-3">
-                            <label for="categoryName" class="form-label">Category Name</label>
-                            <input type="text" class="form-control" id="categoryName" name="category_name" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Add Category</button>
-                    </form>
-                </div>
-            </div>
+   <!-- Add Category Modal -->
+   <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addCategoryModalLabel">Add New Product</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="addCategoryForm" action="controller/add_product.php" method="POST">
+              <div class="mb-3">
+                <label for="categoryName" class="form-label">Category Name</label>
+                <input type="text" class="form-control" id="categoryName" name="categoryName" required>
+                <label for="productName" class="form-label">Product Name</label>
+                <input type="text" class="form-control" id="productName" name="productName" required>
+                <label for="price" class="form-label">Price</label>
+                <input type="text" class="form-control" id="price" name="price" required>
+
+               
+
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" form="addCategoryForm" class="btn btn-primary">Save Product</button>
+          </div>
         </div>
+      </div>
     </div>
     <!-- End Add Category Modal -->
+
 
 
     <!-- Status Modal -->
@@ -111,7 +125,7 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
             <form id="updateProductForm" action="controller/update_product.php" method="POST" >
               <div class="mb-3">
 
-              <input type="hidden" name="id" value="">
+              <input type="hidden" name="id" id="updateProductId" value="">
 
               <label for="updateProductName" class="form-label">Product Name</label>
               <input type="text" class="form-control" id="updateProductName" name="name" required>
@@ -208,41 +222,43 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
                                     </thead>
                                     <tbody>
                                     <?php
+                            // Fetch categories from the database
+                $query = "SELECT * FROM product_list where category='$category'";
+                $result = mysqli_query($connection, $query);
 
-                            $query = "SELECT * FROM product_list where category='$category'";
-                            $result = mysqli_query($connection, $query);
-                            
-                            // Check if any categories were found
-                            if (mysqli_num_rows($result) > 0) {
-                                while ($row = mysqli_fetch_assoc($result)) {
-                                  echo '<tr>';
-                                  echo '<td>' . htmlspecialchars($row['name']) . '</td>';
-                                  echo '<td>' . htmlspecialchars($row['stock']) . '</td>';
-                                  echo '<td>₱' . htmlspecialchars($row['price']) . '</td>';
-                                  echo '<td>' . htmlspecialchars($row['last_restock']) . '</td>';
-                                  echo '<td>
-                                          <button class="btn btn-warning btn-sm update-btn" 
-                                                  data-bs-toggle="modal" 
-                                                  data-bs-target="#updateProductModal" 
-                                                  data-product-id="' . $row['id'] . '"
-                                                  data-product-name="' . htmlspecialchars($row['name']) . '"
-                                                  data-product-category="' . htmlspecialchars($row['category']) . '"
-                                                  data-product-price="' . htmlspecialchars($row['price']) . '"
-                                                  data-product-stock="' . htmlspecialchars($row['stock']) . '">Update</button>
-                                          <button class="btn btn-danger btn-sm delete-btn" 
-                                                  data-bs-toggle="modal" 
-                                                  data-bs-target="#deleteConfirmationModal"
-                                                  data-product-id="' . $row['id'] . '">Delete</button>
-                                          <button class="btn btn-success btn-sm restock-btn" 
-                                                  data-bs-toggle="modal" 
-                                                  data-bs-target="#restockProductModal"
-                                                  data-product-id="' . $row['id'] . '">Restock</button>
-                                        </td>';
-                                  echo '</tr>';
-                                }
-                            } else {
-                                echo "<tr><td colspan='5' class='text-center'>No products found</td></tr>";
-                            }
+                // Check if any categories were found
+                if (mysqli_num_rows($result) > 0) {
+                    // Output data of each row
+                      // Output data of each row
+                while ($row = mysqli_fetch_assoc($result)) {
+                  echo '<tr>';
+                  echo '<td>' . htmlspecialchars($row['name']) . '</td>';
+                  echo '<td>' . htmlspecialchars($row['stock']) . '</td>';
+                  echo '<td>₱' . htmlspecialchars($row['price']) . '</td>';
+                  echo '<td>' . htmlspecialchars($row['last_restock']) . '</td>';
+                  
+
+                  echo '<td>
+                  <button class="btn btn-warning btn-sm update-btn" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#updateProductModal" 
+                  data-product-id="' . $row['id'] . '"
+                  data-product-name="' . htmlspecialchars($row['name']) . '"
+                  data-product-category="' . htmlspecialchars($row['category']) . '"
+                  data-product-price="' . htmlspecialchars($row['price']) . '"
+                  data-product-stock="' . htmlspecialchars($row['stock']) . '">Update</button>
+          <button class="btn btn-danger btn-sm" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#deleteConfirmationModal">Delete</button>
+          <button class="btn btn-success btn-sm" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#restockProductModal">Restock</button>
+                  </td>';
+                  echo '</tr>';
+              }
+          } else {
+              echo "<tr><td colspan='55' class='text-center'>No products found</td></tr>";
+          }
                             ?>
                                     </tbody>
                                 </table>
@@ -252,10 +268,14 @@ $category = isset($_GET['category']) ? $connection->real_escape_string($_GET['ca
  </div>          
         </div>
     </div>
+   
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Product</button>
+           
 </div>
 
 
     </main>
+    
 
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
@@ -338,6 +358,23 @@ $(document).ready(function() {
         modal.find('#updateProductStock').val(productStock);
     });
 </script>
+
+<script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            if (status) {
+                const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+                const statusModalBody = document.getElementById('statusModalBody');
+                if (status === 'success') {
+                    statusModalBody.textContent = 'Product updated successfully!';
+                } else if (status === 'error') {
+                    statusModalBody.textContent = 'Error updating product.';
+                }
+                statusModal.show();
+            }
+        });
+    </script>
 
  
 </body>
